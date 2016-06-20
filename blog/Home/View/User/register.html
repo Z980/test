@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>用户注册</title>
+	<link rel="stylesheet" href="__PUBLIC__/css/bootstrap.min.css"/>
+	<script type="text/javascript" src="__PUBLIC__/js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="__PUBLIC__/js/jquery.validate.js"></script>
+	<style type="text/css">
+	#verify{
+		display: inline;
+	}
+	#img{
+		display: inline;
+	}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-8 col-sm-offset-2">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">用户注册</h3>
+					</div>
+					<div class="panel-body">
+						<form id="signupForm" method="post" class="form-horizontal" action="__SELF__">
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="username">用户名</label>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" id="username" name="username" placeholder="用户名" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="password">密码</label>
+								<div class="col-sm-5">
+									<input type="password" class="form-control" id="password" name="password" placeholder="密码" />
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="confirm_password">确认密码</label>
+								<div class="col-sm-5">
+									<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="确认密码" />
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="email">Email</label>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" id="email" name="email" placeholder="Email" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="验证码">验证码</label>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" id="verify" name="verify" placeholder="验证码"  style="width:40%" />
+									<img id="img" src="__CONTROLLER__/verify/" onclick="this.src='__CONTROLLER__/verify/'+Math.random()">
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<div class="col-sm-5 col-sm-offset-4">
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" id="agree" name="agree" value="agree" />同意相关政策规定
+										</label>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-sm-9 col-sm-offset-4">
+									<button type="submit" class="btn btn-primary" name="signup" value="Sign up">注册</button>
+									&nbsp&nbsp<a href="{:U('Index/index')}">已有账号</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+var user_url="{:U('namecheck')}";
+var email_url="{:U('emailcheck')}";
+		$.validator.setDefaults( {
+			submitHandler: function () {
+				form.submit('确认提交');
+			}
+		} );
+
+		$( document ).ready( function () {
+			$( "#signupForm" ).validate( {
+				rules: {
+					username: {
+						required: true,
+						minlength: 2,
+						remote:{
+                        url: user_url,     //后台处理程序
+                        type: "post",               //数据发送方式
+                        dataType: "json",           //接受数据格式   
+                        data: {                     //要传递的数据
+            	            username: function() {
+                             return $("#username").val();
+                               }
+                              }
+					}
+				},
+					password: {
+						required: true,
+						minlength: 5
+					},
+					confirm_password: {
+						required: true,
+						minlength: 5,
+						equalTo: "#password"
+					},
+					email: {
+						required: true,
+						email: true,
+						remote:{
+                        url: email_url,     //后台处理程序
+                        type: "post",               //数据发送方式
+                        dataType: "json",           //接受数据格式   
+                        data: {                     //要传递的数据
+            	            email: function() {
+                             return $("#email").val();
+                               }
+                              }
+                          }
+					},
+					agree: "required"
+				},
+				messages: {
+					username: {
+						required: "请输入用户名",
+						minlength: "用户名至少两个字符",
+						remote:"用户已存在"
+						},
+					password: {
+						required: "请输入密码",
+						minlength: "密码至少五位"
+					},
+					confirm_password: {
+						required: "请输入密码",
+						minlength: "密码至少五位",
+						equalTo: "两次密码不一致"
+					},
+					email:{
+						required:"请输入正确的邮箱地址",
+						remote:"邮箱已被注册"
+					},
+					agree: "请同意相关政策"
+				},
+				errorElement: "em",
+				errorPlacement: function ( error, element ) {
+					// Add the `help-block` class to the error element
+					error.addClass( "help-block" );
+
+					if ( element.prop( "type" ) === "checkbox" ) {
+						error.insertAfter( element.parent( "label" ) );
+					} else {
+						error.insertAfter( element );
+					}
+				},
+				highlight: function ( element, errorClass, validClass ) {
+					$( element ).parents( ".col-sm-5" ).addClass( "has-error" ).removeClass( "has-success" );
+				},
+				unhighlight: function (element, errorClass, validClass) {
+					$( element ).parents( ".col-sm-5" ).addClass( "has-success" ).removeClass( "has-error" );
+				}
+				} ) ;
+		} );
+	</script>
+</body>
+</html>

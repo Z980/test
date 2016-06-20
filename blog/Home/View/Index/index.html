@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>blog</title>
+<link rel="stylesheet" href="__PUBLIC__/css/style.css" type="text/css" />
+<link href="__PUBLIC__/css/styles.css" rel="stylesheet">
+<script src="__PUBLIC__/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery-browser.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.qqFace.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/picture_view.js" charset="utf-8"></script>
+<script type="text/javascript" src="__PUBLIC__/js/blog.js"></script>
+<script type="text/javascript">
+var addcomment="{:U('Index/addcomment')}";
+var like="{:U('Index/like')}";
+var collect="{:U('Index/collect')}";
+var deletecomment="{:U('Index/deletecomment')}";
+var deletesay="{:U('Index/deletesay')}";
+var uid={$Think.session.uid};
+var delepic="__PUBLIC__/images/delete.png";
+ //说说图片
+   $(function(){
+    $('.emotion').qqFace({
+    id : 'facebox', 
+    assign:'saytext', 
+    path:'/blog/Public/images/arclist/' //表情存放的路径
+  });
+    $('#addpic').on('click',function(){
+      $('#up').trigger('click');
+    });
+      $('#up').uploadPreview({ Img: "ImgPr", Width: 120, Height: 120,Callback:function(){$('#clear').show();} });
+      $('#clear').click(function(){
+           var file = $("#up") ;
+           var pic=$('#ImgPr');
+          file.after(file.clone(true).val(""));      
+          file.remove();
+          pic.after('<img id="ImgPr" style="max-width:200px" />') ;
+          pic.remove(); 
+          $('#clear').hide();
+      });
+   }); 
+
+</script>
+</head>
+<body>
+<!--头部-->
+<include file="Common/head"/>
+ <div class="mainContent">
+    <!--左边内容-->
+    <if condition="$Think.session.uid eq null">
+    <include file="User/login"/>
+    <else/>
+    <include file="Common/left"/>
+    </if>
+    <!--主体内容-->
+    <div class="blogitem">
+     <div class="comment">
+     <form action="{:U('User/usersay')}" method="post" enctype="multipart/form-data">
+        <div class="com_form">
+          <textarea class="input" id="saytext" name="content"></textarea>
+          <p><input type="submit" class="sub_btn" value="提交"><span class="emotion">☺</span><img src="__PUBLIC__/images/pic.png" id="addpic" style="height:25px;cursor:pointer" title="重新选择图片再次选择即可"></p>
+        <div style="max-width:650px;margin-top:30px;padding:10px"><img id="ImgPr" style="max-width:200px" /><a id='clear' style="cursor:pointer;margin:50px;font-size:20px">取消选择</a></div><input type="file" name="pictures" id="up"/>
+        </div>
+        </form>
+     </div> 
+     <article>
+     </article>
+     <volist name="list" id="vo">
+      <article>
+      <div class="userinfo">
+      <img style="width:80px;height:80px;background:#ff8b70;float:left; border-radius: 80px; -moz-border-radius: 80px; -webkit-border-radius: 80px; overflow: hidden;margin:0px;" src="__ROOT__/{$vo['thumb']}" >
+      <ul class='usertitle'>
+        <li><big><a href="{:U('user/userhome',array('name'=>$vo['nikename']))}">{$vo['nikename']|default=$vo['username']}</a></big></li><li><span class='time'>{$vo['time']}</span></li></ul><if condition="$Think.session.uid eq $vo['uid']">
+        <div class="delete"><img style="width:30px;height:30px;cursor:pointer" src="__PUBLIC__/images/delete.png"></div></if>
+        </div>
+
+        <div class="textsays">
+        {$vo['content']}
+        <if condition="$vo['pictures'] neq ''"><div><img src="{$vo['pictures']}" style="margin:5px;padding:5px;border:1px solid #32302e;width:650px;border-radius: 5px;background:#708090" /></div></if>
+        </div>
+        <div class="textfoot">
+        <p class='likes'><span class="like">{$vo['like']}</span>个赞</p>
+        <span class="emotion1">☺</span>
+        <input type="text"  name="comment" placeholder="快来吐槽一下吧！" style="height:30px;width:200px;">&nbsp;&nbsp;<a class='addcomment'>评论</a>&nbsp;&nbsp;<?php if(false!==strstr($vo['likes'],$_SESSION['uid'])){echo "<a class='addlike'>取消点赞</a>";}else{echo "<a class='addlike'>赞</a>";}?>&nbsp;&nbsp;<?php if(false!==strstr($vo['collect'],$_SESSION['uid'])){echo "<a class='addcollect'>取消收藏</a>";}else{echo "<a class='addcollect'>收藏</a>";}?><input type="hidden" name="wid" value="{$vo['id']}">
+        </div>
+        <div class="showcomment">
+        <ul>
+        <foreach name='vo["commentes"]' item='v'>
+        <li  class="commentlist"><a href="{:U('user/userhome',array('name'=>$v['commentname']))}">{$v.commentname}</a>&nbsp;&nbsp;:&nbsp;&nbsp;{$v.contentes}&nbsp;&nbsp;<span class="commenttime">{$v.commenttime|date='Y-m-d :H:i',###}</span><input type="hidden" name="commentid" value='{$v.id}'><if condition="$Think.session.uid eq $v['uid']"><img  class='deletecomment' style="width:18px;height:18px;cursor:pointer" src="__PUBLIC__/images/delete.png"></if></li>
+        </foreach>
+         <li  class="commentlist"></li>
+        </ul>
+        </div>
+      </article> 
+      </volist>
+      <div style="text-align:center;font-size:15px">{$page}</div>
+      </div>
+      <a id='totop' title="回到顶部"><img src="__PUBLIC__/images/top.png"></a>
+<footer>
+   <!--<section class="visitor">
+     <h2>最近访客</h2>
+      <ul>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+      </ul>
+   </section>-->
+   <div class="Copyright">
+     <ul>
+       <a href="/">帮助中心</a><a href="/">空间客服</a><a href="/">投诉中心</a><a href="http://www.777moban.com.com/" target="_blank">模板 by dancesmile</a><a href="/">空间协议</a>
+     </ul>
+     <p>Design by 我是mt</p>
+   </div>
+ </footer>
+ 
+</body>
+</html>

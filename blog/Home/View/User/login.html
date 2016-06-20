@@ -1,0 +1,22 @@
+<aside>
+<div class="login">
+	<form action="{:U('User/login')}" method="post">
+		<label>用户名:</label>
+		<input type="text" name="username" required />
+		
+		<label>密码:</label>
+		<input type="password" name="password" required />
+		
+		<span></span>
+		
+		<input type="checkbox" name="save" id="save" />
+		<label for="save">保持登录</label>
+		
+		<input type="submit" value="登录" />
+
+         <div class="zhuce">
+		<p><a href="#">忘记密码?</a>&nbsp&nbsp<a href="{:U('User/register')}">注册</a></p>
+		</div>
+	</form>
+</div>
+</aside>

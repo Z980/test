@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>blog</title>
+<link rel="stylesheet" href="__PUBLIC__/css/style.css" type="text/css" />
+<link href="__PUBLIC__/css/styles.css" rel="stylesheet">
+<script src="__PUBLIC__/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery-browser.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.qqFace.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/blog.js"></script>
+<script type="text/javascript">
+var addcomment="{:U('Index/addcomment')}";
+var like="{:U('Index/like')}";
+var collect="{:U('Index/collect')}";
+var deletecomment="{:U('Index/deletecomment')}";
+var deletesay="{:U('Index/deletesay')}";
+var uid={$Think.session.uid};
+</script>
+</head>
+<body>
+<!--头部-->
+<include file="Common/head"/>
+ <div class="mainContent">
+    <!--左边内容-->
+    <if condition="$Think.session.uid eq null">
+    <include file="User/login"/>
+    <else/>
+    <include file="Common/left"/>
+    </if>
+    <!--主体内容-->
+    <div class="blogitem">
+     <if condition="$status eq 1"><article>
+     <div class="userjianjie" style="text-align:center;background:rgba(<?php echo rand(0,257)-1;?>,<?php echo rand(0,257)-1;?>,<?php echo rand(0,257)-1;?>,0.4)">
+     <img src="{$userinfo['thumb']}" style="width: 160px; height: 160px; border-radius: 160px; -moz-border-radius: 160px; -webkit-border-radius: 160px; overflow: hidden;margin-top:20px;">
+     <div>
+     <ul>
+     <li>昵称:</li>
+     <li>性别:</li>
+     <li>地址:</li>
+     <li>简介:</li>
+     </ul>
+    <ul id='ul2'>
+    <li>{$userinfo['nikename']|default="未设置昵称"}</li>
+    <li>{$userinfo['sex']|default="未知"}</li>
+    <li>{$userinfo['location']|default="未知"}</li>
+    <li>{$userinfo['intro']|default="未设置"}</li>
+    </ul>
+    </ul>
+     </div>
+     </div>
+     </article><else/></if>
+     <article>
+     </article>
+     <if condition="$status neq 4">
+     <volist name="list" id="vo">
+      <article>
+      <div class="userinfo">
+      <img style="width:80px;height:80px;background:#ff8b70;float:left; border-radius: 80px; -moz-border-radius: 80px; -webkit-border-radius: 80px; overflow: hidden;margin:0px;" src="__ROOT__/{$vo['thumb']}" >
+      <ul class='usertitle'>
+        <li><big><a href="">{$userinfo['nikename']|default=$vo['username']}</a></big></li><li><span class='time'>{$vo['time']}</span></li></ul><if condition="$Think.session.uid eq $vo['uid']">
+        <div class="delete"><img style="width:30px;height:30px;cursor:pointer" src="__PUBLIC__/images/delete.png"></div></if>
+        </div>
+        <div class="textsays">
+        {$vo['content']}
+        <if condition="$vo['pictures'] neq ''"><div><img src="{$vo['pictures']}" style="margin:5px;padding:5px;border:1px solid #32302e;width:650px;border-radius: 5px;background:#708090" /></div></if>
+        </div>
+        <div class="textfoot">
+        <p class='likes'><span class="like">{$vo['like']}</span>个赞</p>
+        <span class="emotion1">☺</span>
+        <input type="text"  name="comment" placeholder="快来吐槽一下吧！" style="height:30px;width:200px;">&nbsp;&nbsp;<a class='addcomment'>评论</a>&nbsp;&nbsp;<?php if(false!==strstr($vo['likes'],$_SESSION['uid'])){echo "<a class='addlike'>取消点赞</a>";}else{echo "<a class='addlike'>赞</a>";}?>&nbsp;&nbsp;<?php if(false!==strstr($vo['collect'],$_SESSION['uid'])){echo "<a class='addcollect'>取消收藏</a>";}else{echo "<a class='addcollect'>收藏</a>";}?><input type="hidden" name="wid" value="{$vo['id']}">
+        </div>
+        <div class="showcomment">
+        <ul>
+        <foreach name='vo["commentes"]' item='v'>
+        <li  class="commentlist">{$v.commentname}&nbsp;&nbsp;:&nbsp;&nbsp;{$v.contentes}&nbsp;&nbsp;<span class="commenttime">{$v.commenttime|date='Y-m-d :H:i',###}</span><input type="hidden" name="commentid" value='{$v.id}'><if condition="$Think.session.uid eq $v['uid']"><img  class='deletecomment' style="width:18px;height:18px;cursor:pointer" src="__PUBLIC__/images/delete.png"></if></li>
+        </foreach>
+         <li  class="commentlist"></li>
+        </ul>
+        </div>
+      </article> 
+      </volist>
+      <else/>
+      <script type="text/javascript">
+      $(function(){
+        $('.piccomment').hide();
+        $('.pic').on('click',function(){
+          var thisimg=$(this);
+           thisimg.parent().parent().find('.piccomment').show();
+        });
+        $('.close').on('click',function(){
+          var thishide=$(this);
+          thishide.parent().hide();
+        });
+      });
+      </script>
+      <div style="padding:20px">
+      <volist name="list" id="vo">
+      <div>
+      <div style="width:200px;height:200px;overflow:hidden;float:left;margin:10px;padding:0px;cursor:pointer">
+      <img src="{$vo['pictures']}" style="width:300px;" class='pic'/></div>
+      <div class="piccomment" style="width:800px;height:500px;position:fixed;background:rgb(255,255,255);overflow:hidden;margin-left: auto;margin-right:auto;padding:0px">
+      <img src="{$vo['pictures']}" style="max-width:400px;float:left;" />
+      <a class="close" style="width:50px;font-size: 20px; position:absolute;right:0px;top:5px;cursor:pointer">关闭</a>
+      <div style="float:left">
+       <div class="text">
+        <span class="emotion1">☺</span>
+        <input type="text"  name="comment" placeholder="快来吐槽一下吧！" style="height:30px;width:200px;">&nbsp;&nbsp;<a class='addcomment'>评论</a>&nbsp;&nbsp;<input type="hidden" name="wid" value="{$vo['id']}">
+        </div>
+        <div class="showcomment" style="overflow:auto">
+        <ul>
+        <foreach name='vo["commentes"]' item='v'>
+        <li  class="commentlist">{$v.commentname}&nbsp;&nbsp;:&nbsp;&nbsp;{$v.contentes}&nbsp;&nbsp;<span class="commenttime">{$v.commenttime|date='Y-m-d :H:i',###}</span><input type="hidden" name="commentid" value='{$v.id}'><if condition="$Think.session.uid eq $v['uid']"><img  class='deletecomment' style="width:18px;height:18px;cursor:pointer" src="__PUBLIC__/images/delete.png"></if></li>
+        </foreach>
+         <li  class="commentlist"></li>
+        </ul>
+        </div>
+        </div>
+        </div>
+        </div>
+        </volist>
+      </div> 
+      </if>
+      <div style="text-align:center;font-size:15px">{$page}</div>
+      </div>
+      </div>
+      </div>
+      <a id='totop' title="回到顶部"><img src="__PUBLIC__/images/top.png"></a>
+<footer>
+   <section class="visitor">
+     <h2>最近访客</h2>
+      <ul>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+        <li><a href="/"><img src=""></a></li>
+      </ul>
+   </section>
+   <div class="Copyright">
+     <ul>
+       <a href="/">帮助中心</a><a href="/">空间客服</a><a href="/">投诉中心</a><a href="http://www.777moban.com.com/" target="_blank">模板 by dancesmile</a><a href="/">空间协议</a>
+     </ul>
+     <p>Design by 我是mt</p>
+   </div>
+ </footer>
+ 
+</body>
+</html>

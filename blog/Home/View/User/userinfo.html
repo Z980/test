@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>个人资料修改</title>
+<link rel="stylesheet" href="__PUBLIC__/css/style.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/css/uploadify.css"/>
+<link href="__PUBLIC__/css/styles.css" rel="stylesheet">
+<script type="text/javascript" src="__PUBLIC__/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/city.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uploadify.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.form').hide();
+  $('.form:first').show();
+  $('#move-animate-left li').click(function(){
+    var index = $(this).index();
+    $(this).addClass('current').siblings().removeClass('current');
+    $('.form').hide().eq(index).show();
+  });
+  //城市联动
+  new PCAS('location_p', 'location_c', 'location_a',"{$userinfo['province']|default=''}","{$userinfo['city']|default=''}","{$userinfo['area']|default=''}");
+  //图片上传uploadify插件
+  $('#userphoto').uploadify({
+  swf:'__PUBLIC__/images/uploadify.swf',//核心文件
+  uploader:'{:U("User/facephoto")}',//上传地址
+  buttonImage:'__PUBLIC__/images/browse-btn.png',//按钮图片
+  width:120,
+  height:30,
+  fileTypeDesc:"Image File",//提示文件类型
+  fileTypeExts:"*.jpg;*.jpeg;*.gif;*.png",//图片后缀
+  fileSizeLimit:'1MB',//大小限制
+  onUploadSuccess:function(file,data,response){
+    eval('var data='+data);
+    if(data.status){
+      $('#faceimg').attr('src','__ROOT__'+data.thumb);
+      $('#face160').attr('value',data.thumb);
+      $('#i').attr('value',data.img);
+    }else{
+      alert('修改出错'+data.msg);
+    }
+  }
+  });
+  $('#face').attr('style',"background:url('{$userinfo['thumb']}') no-repeat");
+});
+</script>
+</head>
+<body>
+<!--头部-->
+<include file="Common/head"/>
+ <div class="mainContent">
+    <!--左边内容-->
+    
+    <include file="Common/left"/>
+    <div class="blogitm">
+    <div class="ul">
+  <ul class="tabbtn" id="move-animate-left">
+    <li class="current"><a>基本资料修改</a></li>
+    <li><a>头像修改</a></li>
+    <li><a>密码修改</a></li>
+  </ul><!--tabbtn end-->
+  </div>
+  <div class="tabcon" id="leftcon">
+    <div class="subbox">
+      <div class="sublist">
+        <form action="{:U('editinfo')}" method='post' class="form" id="infoform">
+        <ul class="info">
+        <li><label for=""><span class='red'>*</span>昵称：</label></li>
+        <li><label for=""><span class='red'>*</span>性别：</label></li>
+        <li><label for=""><span class='red'>*</span>所在地：</label></li>
+        <li><label for="" class='intro'>一句话介绍自己：</label></li>
+        </ul>
+        <ul class="info">
+            <li>
+              <input type="text" name='nikename' id="nikename" value="{$userinfo['nikename']}"/>
+            </li>
+            <li>
+              
+              <input type="radio" name='sex' value='1' <if condition='$userinfo["sex"] eq "男"'>checked="checked"</if>/>&nbsp;男&nbsp;&nbsp;
+              <input type="radio" name='sex' value='2' <if condition='$userinfo["sex"] eq "女"'>checked="checked"</if>/>&nbsp;女
+            </li>
+            <li><div>
+            <select name="location_p" id="location_p"></select>
+            <select name="location_c" id="location_c"></select>
+            <select name="location_a" id="location_a"></select>
+                  </div>
+            </li>
+            <li>
+              <textarea name="intro" >{$userinfo.intro|default=''}</textarea>
+            </li>
+            <li>
+              <input type="submit" value='保存修改' class='edit-sub'/>
+            </li>
+            </ul>
+          </form>
+      </div><!--tabcon end-->
+      <div class="sublist">
+        <form action="{:U('facesave')}" method='post' class="form" enctype="multipart/form-data">
+            <div>
+              <img src="" width='160' height='160' id='faceimg'/>
+              </div>
+              <div class="upload">
+              <ul class="userphoto">
+              <li>
+                <input type="file" name='image' id='userphoto'/>
+              </li>
+              <li>
+                            <input type="hidden" name='thumb' id="face160"/>
+                            <input type="hidden" name='i' id="i"/>
+                <input type="submit" value='保存修改'/>
+              </li>
+              </ul>
+            </div>
+          </form>
+      </div><!--tabcon end-->
+      <div class="sublist">
+        <form action="{:U('passchange')}" method='post'class="form">
+        <ul class="info">
+        <li><label for="">账号邮箱：</label></li>
+        <li><label for=""><span class='red'>*</span>旧密码：</label></li>
+        <li> <label for=""><span class='red'>*</span>新密码：</label></li>
+        <li><label for=""><span class='red'>*</span>确认密码：</label></li></ul>
+        <ul class="info">
+        <li>
+        <input type="text" readonly="readonly" name="email" value="{$userinfo['email']}">
+        </li>
+            <li>
+              
+              <input type="password" name='old' class='input'/>
+            </li>
+            <li>
+             
+              <input type="password" name='new' class='input'/>
+            </li>
+            <li>
+              
+              <input type="password" name='new_comfirm' />
+            </li>
+            <li>
+              <input type="submit" value='确认修改'/>
+            </li>
+            </ul>
+          </form>
+      </div><!--tabcon end-->
+    </div>
+    </div>
+  </div>
+</body>
+</html>

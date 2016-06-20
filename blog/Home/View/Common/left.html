@@ -1,0 +1,12 @@
+<aside>
+      <div class="avatar">
+        <a href="{:U('User/userinfo')}" id='face' title="编辑个人资料" style="background:url('{$Think.session.thumb}')"><span>{$Think.session.username}</span></a>
+      </div>
+      <section class="topspaceinfo">
+        <p>{$userinfo['intro']|default="个人简介(空)"}</p>
+      </section>
+      <div class="userinfo"> 
+        <p class="q-fans"> 说说：<a href="{:U('User/userhome',array('status'=>2))}" target="_blank">{$Think.session.saycount}</a></p> 
+        <p class="btns"><a href="{:U('User/letter')}" target="_blank" >私信</a><a href="{:U('User/userhome',array('status'=>4))}" target="_blank">相册</a><a href="{:U('User/userhome',array('status'=>3))}" target="_blank">收藏</a></p>   
+      </div>
+    </aside>
